@@ -1,0 +1,38 @@
+@layer components {
+
+    /* Buttons */
+    .btn-primary {
+        @apply inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-secondary {
+        @apply inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-danger {
+        @apply inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500;
+    }
+
+    /* Form Elements */
+    .input-field {
+        @apply mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+    }
+
+    .label-text {
+        @apply block text-sm font-medium text-gray-700;
+    }
+
+    /* Cards */
+    .card {
+        @apply bg-white shadow rounded-lg px-4 py-5 sm:px-6;
+    }
+
+    /* Layouts */
+    .page-header {
+        @apply text-2xl font-bold text-gray-900;
+    }
+
+    .page-subheader {
+        @apply mt-1 text-sm text-gray-500;
+    }
+}

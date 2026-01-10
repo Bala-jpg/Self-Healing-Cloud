@@ -1,5 +1,0 @@
-{
-  "severity": "ERROR",
-  "textPayload": "KeyError: 'DATABASE_URL' not found in environment. Process exited with code 1",
-  "resource": {"labels": {"service_name": "payment-api"}}
-}
