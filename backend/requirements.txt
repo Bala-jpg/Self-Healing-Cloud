@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Web Framework and Server
 fastapi
 uvicorn
@@ -16,3 +17,9 @@ firebase-admin
 # Utilities
 python-dotenv
 requests
+=======
+google-generativeai
+pydantic
+python-dotenv
+firebase-admin
+>>>>>>> c390916490281795dd24c95a3810f14d6287396c
