@@ -250,13 +250,13 @@ async def google_callback(
         
         # Redirect to frontend with success and user data
         redirect_url = f"{FRONTEND_URL}/auth/success?token={session_token}"
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(url=redirect_url, status_code=302)
         
     except Exception as e:
         print(f"❌ OAuth callback error: {e}")
         # Redirect to frontend with error
         error_url = f"{FRONTEND_URL}/auth?error=oauth_failed&message={str(e)}"
-        return RedirectResponse(url=error_url)
+        return RedirectResponse(url=error_url, status_code=302)
 
 
 @router.get("/google/status")
