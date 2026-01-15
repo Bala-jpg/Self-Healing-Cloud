@@ -177,7 +177,7 @@ async def process_trace_async(trace_id, logs):
 # Simple in-memory rate limiter
 last_analysis_time = 0
 
-async def run_analysis_for_api(time_range_minutes=60, max_traces: Optional[int] = 10, user_id="default_user"):
+async def run_analysis_for_api(time_range_minutes=60, max_traces: Optional[int] = 5, user_id="default_user"):
     global last_analysis_time
     import time
     
@@ -218,14 +218,27 @@ async def run_analysis_for_api(time_range_minutes=60, max_traces: Optional[int] 
         if not traces: 
             return {"results": []}
         
-        # 2. Parallel AI Analysis
-        tasks = []
+        # 2. Sequential AI Analysis (Throttled for Free Tier)
+        completed_analyses = []
         selected_traces = list(traces.items())[:max_traces]
         print(f"✂️ Limiting analysis to {len(selected_traces)} traces (requested max: {max_traces})")
-        for trace_id, log_list in selected_traces:
-            tasks.append(process_trace_async(trace_id, log_list))
         
-        completed_analyses = await asyncio.gather(*tasks)
+        print(f"🐌 Starting throttled analysis (Limit: 3 RPM for Free Tier)...")
+        for i, (trace_id, log_list) in enumerate(selected_traces):
+            if i > 0:
+                print("⏳ Throttling: Waiting 15s to respect Gemini Rate Limit...")
+                await asyncio.sleep(15) # 15s delay = 4 requests/min (Safe for 5 RPM limit)
+
+            try:
+                res = await process_trace_async(trace_id, log_list)
+                completed_analyses.append(res)
+            except Exception as e:
+                print(f"❌ Trace {trace_id} failed: {e}")
+                if "429" in str(e):
+                     print("🛑 Quota Hit. Stopping remaining batch.")
+                     break
+        
+        # results = await asyncio.gather(*tasks) # REMOVED PARALLEL EXECUTION
             
         # 3. Format Results
         results = []
