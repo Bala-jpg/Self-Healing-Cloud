@@ -25,7 +25,7 @@ except ImportError as e:
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(parent_dir, ".env"))
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={GEMINI_API_KEY}"
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 # --- 3. FIREBASE INITIALIZATION ---
 def init_firebase():
