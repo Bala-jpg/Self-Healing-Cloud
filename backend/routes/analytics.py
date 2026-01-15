@@ -48,7 +48,18 @@ async def get_analytics_summary():
         services = set()
         for d in recent_docs:
             data = d.to_dict()
-            conf = data.get("analysis", {}).get("confidence", 0)
+            raw_conf = data.get("analysis", {}).get("confidence", 0)
+            
+            # Safe conversion
+            conf = 0
+            try:
+                if isinstance(raw_conf, (int, float)):
+                    conf = raw_conf
+                elif isinstance(raw_conf, str) and raw_conf.replace('%', '').strip().isdigit():
+                    conf = float(raw_conf.replace('%', '').strip())
+            except:
+                conf = 0
+                
             if conf > 0: confidences.append(conf)
             if data.get("service_name"): services.add(data.get("service_name"))
         
@@ -131,9 +142,21 @@ async def get_analytics_trends(range: str = "7d"):
 
             # Scatter data (Risk Matrix)
             analysis = data.get("analysis", {})
-            confidence = analysis.get("confidence", 0)
-            if isinstance(confidence, (int, float)) and confidence <= 1.0:
+            raw_conf = analysis.get("confidence", 0)
+            confidence = 0
+            try:
+                if isinstance(raw_conf, (int, float)):
+                    confidence = raw_conf
+                elif isinstance(raw_conf, str) and raw_conf.replace('%', '').strip().isdigit():
+                    confidence = float(raw_conf.replace('%', '').strip())
+            except:
+                confidence = 0
+
+            # Normalize 0.0-1.0 to 0-100
+            if confidence <= 1.0 and confidence > 0:
                 confidence = round(confidence * 100)
+            elif confidence > 100:
+                confidence = 100
                 
             risk_matrix.append({
                 "confidence": confidence,
