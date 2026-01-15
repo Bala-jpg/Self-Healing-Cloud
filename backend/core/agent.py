@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import sys
 import json
 import asyncio
@@ -25,7 +26,7 @@ except ImportError as e:
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(parent_dir, ".env"))
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
 
 # --- 3. FIREBASE INITIALIZATION ---
 def init_firebase():
@@ -94,6 +95,8 @@ async def analyze_logs_async(log_data):
                 # Handle possible markdown blocks in response
                 text = text.replace('```json', '').replace('```', '').strip()
                 return json.loads(text)
+            else:
+                print(f"❌ Gemini API Error: Status {response.status_code} - {response.text}")
         return None
     except Exception as e:
         print(f"❌ Gemini Error: {e}")
@@ -171,7 +174,20 @@ async def process_trace_async(trace_id, logs):
     return (trace_id, logs, None)
 
 # --- 6. LIVE WRAPPER (ASYNC) ---
-async def run_analysis_for_api(time_range_minutes=60, max_traces=10, user_id="default_user"):
+# Simple in-memory rate limiter
+last_analysis_time = 0
+
+async def run_analysis_for_api(time_range_minutes=60, max_traces: Optional[int] = 10, user_id="default_user"):
+    global last_analysis_time
+    import time
+    
+    current_time = time.time()
+    if current_time - last_analysis_time < 10: # 10 seconds cooldown
+        print(f"⏳ Rate Limit: Skipping analysis (cooldown active).")
+        return {"results": [], "note": "Rate limit active. Please wait 10 seconds."}
+    
+    last_analysis_time = current_time
+
     """
     Run analysis using stored user credentials (FAST ASYNC VERSION)
     """
@@ -205,6 +221,7 @@ async def run_analysis_for_api(time_range_minutes=60, max_traces=10, user_id="de
         # 2. Parallel AI Analysis
         tasks = []
         selected_traces = list(traces.items())[:max_traces]
+        print(f"✂️ Limiting analysis to {len(selected_traces)} traces (requested max: {max_traces})")
         for trace_id, log_list in selected_traces:
             tasks.append(process_trace_async(trace_id, log_list))
         
@@ -284,6 +301,8 @@ async def chat_with_ai_async(message, user_id="default_user"):
                     parts = content.get('parts', [])
                     if parts:
                         return {"reply": parts[0].get('text', "I'm unable to provide a response right now.")}
+            else:
+                 print(f"❌ Chat Gemini API Error: Status {response.status_code} - {response.text}")
         return {"reply": "I'm having trouble connecting to my brain. Please try again."}
     except Exception as e:
         print(f"❌ Chat Gemini Error: {e}")
