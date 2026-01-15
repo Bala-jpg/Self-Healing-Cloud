@@ -50,7 +50,7 @@ class EmailService:
                 <p><strong>Summary:</strong> {incident_data.get('redacted_text')}</p>
               </div>
               <p style="margin-top: 20px;">
-                <a href="http://localhost:5173/incidents" style="background-color: #00d1ff; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">VIEW IN MISSION CONTROL</a>
+                <a href="https://cloud-rca-assistant.vercel.app/incidents" style="background-color: #00d1ff; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">VIEW IN MISSION CONTROL</a>
               </p>
             </div>
           </body>
